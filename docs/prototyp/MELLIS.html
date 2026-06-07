@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MELLIS — Pasieka rodzinna · Miód prosto z plastra</title>
+<link rel="stylesheet" href="assets/styles.css" />
+<style>
+  /* layout-specific responsive overrides */
+  @media (max-width: 1080px) {
+    .prod-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .rev-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+  @media (max-width: 920px) {
+    .hero-copy { text-align: left; }
+    .wrap > .story-grid, .pdp-grid, .checkout-grid, .foot-grid, .news-grid { grid-template-columns: 1fr !important; }
+    .story-grid { gap: 36px !important; }
+    .news-grid { gap: 24px !important; }
+    .pdp-visual { position: static !important; min-height: 380px !important; }
+    .checkout-grid aside { position: static !important; }
+    .nav-desktop { display: none !important; }
+    .nav-burger { display: inline-flex !important; }
+  }
+  @media (max-width: 760px) {
+    .prod-grid, .rev-grid, .jrn-grid, .gallery-grid { grid-template-columns: 1fr !important; }
+    .foot-grid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+    .wrap [style*="grid-template-columns: 1fr 1fr"],
+    .wrap [style*="repeat(4,1fr)"] { grid-template-columns: 1fr !important; }
+    .serif-xl { font-size: 46px !important; }
+  }
+  /* hide tweaks-driven mobile nav container by default */
+  .nav-mobile { display: block; }
+</style>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#FAF5EA"/>
+    <polygon points="50,20 74,33 74,60 50,73 26,60 26,33" fill="#C8881E"/>
+    <polygon points="50,33 62,40 62,53 50,60 38,53 38,40" fill="#FAF5EA"/>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- React + Babel (pinned) -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- data (plain script, runs first) -->
+<script src="assets/data.js"></script>
+
+<!-- shared shell + components -->
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="assets/components.jsx"></script>
+
+<!-- pages -->
+<script type="text/babel" src="assets/pages-home.jsx"></script>
+<script type="text/babel" src="assets/pages-store.jsx"></script>
+<script type="text/babel" src="assets/pages-checkout.jsx"></script>
+<script type="text/babel" src="assets/pages-content.jsx"></script>
+
+<!-- app (mounts last) -->
+<script type="text/babel" src="assets/app.jsx"></script>
+</body>
+</html>

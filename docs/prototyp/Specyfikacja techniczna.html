@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MELLIS — Specyfikacja techniczna dla programisty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cream:#FAF5EA; --paper:#FFFDF8; --ink:#2A2014; --ink-soft:#5B4A33; --ink-faint:#8A7656;
+    --line:#E4D8BF; --line-soft:#EFE7D4; --honey:#C8881E; --honey-deep:#A8631A; --amber-wash:#F6E8C8; --sage:#6E7355;
+    --serif:'Cormorant Garamond',Georgia,serif; --sans:'Jost',system-ui,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.66;font-weight:400;-webkit-font-smoothing:antialiased;}
+  .doc{max-width:880px;margin:0 auto;padding:0 40px;}
+  h1,h2,h3,h4{font-family:var(--serif);font-weight:500;line-height:1.1;letter-spacing:-.01em;}
+  /* cover */
+  .cover{min-height:62vh;display:flex;flex-direction:column;justify-content:center;padding:90px 0 60px;border-bottom:1px solid var(--line);}
+  .brandmark{display:flex;align-items:center;gap:12px;margin-bottom:40px;}
+  .hex{width:22px;height:24px;background:var(--honey);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);position:relative;}
+  .hex::after{content:'';position:absolute;inset:24%;background:var(--cream);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);}
+  .wordmark{font-family:var(--serif);font-weight:600;font-size:24px;letter-spacing:.16em;text-transform:uppercase;}
+  .eyebrow{font-size:12px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--honey-deep);}
+  .cover h1{font-size:clamp(44px,6vw,72px);margin:18px 0 0;}
+  .cover .lede{font-size:19px;color:var(--ink-soft);max-width:600px;margin-top:22px;}
+  .meta-row{display:flex;gap:36px;margin-top:40px;flex-wrap:wrap;}
+  .meta-row div span{display:block;}
+  .meta-k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);}
+  .meta-v{font-family:var(--serif);font-size:21px;color:var(--ink);}
+  /* sections */
+  section{padding:56px 0;border-bottom:1px solid var(--line-soft);}
+  .sec-num{font-family:var(--serif);font-size:15px;color:var(--honey);letter-spacing:.1em;}
+  h2{font-size:32px;margin:6px 0 8px;}
+  .sec-intro{color:var(--ink-soft);font-size:16.5px;max-width:640px;margin-bottom:28px;}
+  h3{font-size:22px;margin:32px 0 12px;color:var(--ink);}
+  h4{font-size:17px;font-family:var(--sans);font-weight:600;letter-spacing:.02em;margin:22px 0 8px;}
+  p{margin-bottom:14px;color:var(--ink-soft);}
+  p strong, li strong{color:var(--ink);font-weight:600;}
+  ul,ol{margin:0 0 16px 22px;color:var(--ink-soft);}
+  li{margin-bottom:7px;padding-left:4px;}
+  a{color:var(--honey-deep);}
+  /* callout */
+  .note{background:var(--amber-wash);border-radius:8px;padding:18px 20px;margin:18px 0;font-size:14.5px;color:var(--ink-soft);display:flex;gap:12px;}
+  .note .hex{flex:none;width:14px;height:16px;margin-top:3px;}
+  .note .hex::after{background:var(--amber-wash);}
+  .note strong{color:var(--honey-deep);}
+  /* table */
+  table{width:100%;border-collapse:collapse;margin:18px 0 24px;font-size:14px;}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper);}
+  td{color:var(--ink-soft);}
+  td code, p code, li code{font-family:var(--mono);font-size:12.5px;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--honey-deep);}
+  td:first-child{color:var(--ink);font-weight:500;}
+  /* code block */
+  pre{background:#251c11;color:#F2E4C4;border-radius:8px;padding:22px 24px;overflow-x:auto;margin:16px 0 24px;font-family:var(--mono);font-size:12.5px;line-height:1.6;}
+  pre .c{color:#8A7656;} pre .k{color:#E6B23C;} pre .s{color:#B7C58E;}
+  /* method tags */
+  .m{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;color:#fff;margin-right:8px;}
+  .get{background:var(--sage);} .post{background:var(--honey-deep);} .patch{background:#9A7B2E;} .del{background:#A24B2E;}
+  .ep{font-family:var(--mono);font-size:13px;color:var(--ink);}
+  /* steps */
+  .steps{counter-reset:s;list-style:none;margin-left:0;}
+  .steps li{counter-increment:s;position:relative;padding-left:42px;margin-bottom:18px;min-height:26px;}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--cream);font-family:var(--sans);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  /* phase cards */
+  .phases{display:grid;gap:14px;margin:20px 0;}
+  .phase{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:20px 22px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;}
+  .phase .ph-n{font-family:var(--serif);font-size:34px;color:var(--line);line-height:1;}
+  .phase h4{margin:0 0 3px;}
+  .phase p{margin:0;font-size:14px;}
+  .phase .ph-t{font-size:12.5px;color:var(--honey-deep);font-weight:600;white-space:nowrap;letter-spacing:.04em;}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .stack-card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px 20px;}
+  .stack-card .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);}
+  .stack-card .val{font-family:var(--serif);font-size:21px;color:var(--ink);margin:4px 0 6px;}
+  .stack-card p{font-size:13.5px;margin:0;}
+  footer{padding:50px 0 80px;text-align:center;color:var(--ink-faint);font-size:13px;}
+  .toc{columns:2;column-gap:36px;margin:8px 0 0;}
+  .toc a{display:block;padding:7px 0;border-bottom:1px solid var(--line-soft);color:var(--ink-soft);font-size:14.5px;text-decoration:none;break-inside:avoid;}
+  .toc a:hover{color:var(--honey-deep);}
+  .toc a span{color:var(--honey);font-family:var(--mono);font-size:12px;margin-right:10px;}
+  @media (max-width:680px){.doc{padding:0 22px;}.twocol,.toc{grid-template-columns:1fr;columns:1;}.phase{grid-template-columns:auto 1fr;}.phase .ph-t{grid-column:2;}}
+  @media print{body{background:#fff;}section{break-inside:avoid;}.cover{min-height:auto;}pre{background:#f4efe2;color:#2A2014;border:1px solid var(--line);}pre .k{color:#A8631A;}pre .c{color:#8A7656;}pre .s{color:#5d6b3a;}}
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="brandmark"><span class="hex"></span><span class="wordmark">Mellis</span></div>
+    <div class="eyebrow">Dokumentacja techniczna · v1.0</div>
+    <h1>Sklep internetowy MELLIS</h1>
+    <p class="lede">Kompletna specyfikacja dla programisty: architektura, model danych, API, integracja płatności i dostawy oraz plan wdrożenia sklepu z miodem z rodzinnej pasieki.</p>
+    <div class="meta-row">
+      <div><span class="meta-k">Projekt</span><span class="meta-v">Sklep e-commerce</span></div>
+      <div><span class="meta-k">Branża</span><span class="meta-v">Miód · produkt spożywczy</span></div>
+      <div><span class="meta-k">Status</span><span class="meta-v">Prototyp UI gotowy</span></div>
+      <div><span class="meta-k">Data</span><span class="meta-v">Czerwiec 2026</span></div>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <section>
+    <div class="sec-num">Spis treści</div>
+    <h2>Co znajdziesz w dokumencie</h2>
+    <nav class="toc">
+      <a href="#cel"><span>01</span>Cel i zakres projektu</a>
+      <a href="#stack"><span>02</span>Rekomendowany stack technologiczny</a>
+      <a href="#arch"><span>03</span>Architektura systemu</a>
+      <a href="#dane"><span>04</span>Model danych</a>
+      <a href="#api"><span>05</span>API — punkty końcowe</a>
+      <a href="#platnosci"><span>06</span>Płatności (Stripe / Przelewy24)</a>
+      <a href="#dostawa"><span>07</span>Dostawa (InPost / kurier)</a>
+      <a href="#admin"><span>08</span>Panel administracyjny i CMS</a>
+      <a href="#prawo"><span>09</span>Wymogi prawne (RODO, sprzedaż żywności)</a>
+      <a href="#seo"><span>10</span>SEO, wydajność, analityka</a>
+      <a href="#ekrany"><span>11</span>Mapa ekranów prototypu</a>
+      <a href="#etapy"><span>12</span>Etapy wdrożenia</a>
+    </nav>
+  </section>
+
+  <!-- 01 CEL -->
+  <section id="cel">
+    <div class="sec-num">01</div>
+    <h2>Cel i zakres projektu</h2>
+    <p class="sec-intro">MELLIS to sklep internetowy rodzinnej pasieki (50 uli, okolice Bolimowskiego Parku Krajobrazowego) sprzedającej miód w trzech wielkościach słoika. Celem jest wdrożenie sprzedaży online z płatnościami i automatyczną wysyłką, przy zachowaniu butikowego, premium charakteru marki.</p>
+    <h4>Zakres MVP (pierwsze wdrożenie)</h4>
+    <ul>
+      <li><strong>Katalog produktów</strong> — 6 odmian miodu, każda w 3 wariantach wielkości (250 g / 500 g / 900 g).</li>
+      <li><strong>Koszyk i checkout</strong> — wielokrokowy proces zamówienia (dostawa → dane → płatność).</li>
+      <li><strong>Płatności online</strong> — BLIK, karta, szybki przelew. Architektura przygotowana pod Stripe lub Przelewy24.</li>
+      <li><strong>Dostawa</strong> — Paczkomat InPost, kurier, bezpłatny odbiór osobisty z pasieki.</li>
+      <li><strong>Treści</strong> — sekcja „O nas", galeria, dziennik/blog, opinie klientów, zapis do newslettera.</li>
+      <li><strong>Panel administracyjny</strong> — zarządzanie produktami, stanami magazynowymi, zamówieniami i treścią bloga.</li>
+    </ul>
+    <h4>Poza zakresem MVP (do rozważenia później)</h4>
+    <ul>
+      <li>Konta klientów i historia zamówień (MVP może działać jako „guest checkout").</li>
+      <li>Programy lojalnościowe, kody rabatowe, zestawy prezentowe konfigurowalne.</li>
+      <li>Wersja anglojęzyczna (obecnie tylko PL).</li>
+      <li>Integracja z księgowością / fakturowaniem (np. Fakturownia, wFirma).</li>
+    </ul>
+    <div class="note"><span class="hex"></span><div><strong>Załączony prototyp</strong> (<code>MELLIS.html</code>) to klikalny, wysokiej wierności wzorzec wyglądu i przepływów — należy traktować go jako źródło prawdy dla UI. Zawiera 3 warianty strony głównej (przełączane w panelu Tweaks) do wyboru kierunku graficznego.</div></div>
+  </section>
+
+  <!-- 02 STACK -->
+  <section id="stack">
+    <div class="sec-num">02</div>
+    <h2>Rekomendowany stack technologiczny</h2>
+    <p class="sec-intro">Dwie ścieżki. <strong>Ścieżka A</strong> — gotowa platforma, szybkie i tanie uruchomienie. <strong>Ścieżka B</strong> — własna aplikacja, pełna kontrola i unikalny wygląd zgodny z prototypem.</p>
+
+    <h3>Ścieżka A — gotowa platforma (najszybciej)</h3>
+    <p>Dla minimalnego nakładu i kosztu utrzymania. Wymaga akceptacji ograniczeń motywu graficznego.</p>
+    <ul>
+      <li><strong>Shopify</strong> lub <strong>WooCommerce</strong> (WordPress) — wbudowane płatności, dostawa, panel.</li>
+      <li>W Polsce dobrze wspierane: <strong>Przelewy24</strong>, <strong>InPost</strong>, <strong>BaseLinker</strong> do automatyzacji.</li>
+      <li>Prototyp MELLIS przekładamy na motyw (theme) — kolory, typografia i układ jako punkt wyjścia.</li>
+    </ul>
+
+    <h3>Ścieżka B — własna aplikacja (rekomendowana dla pełnej wierności prototypowi)</h3>
+    <div class="twocol">
+      <div class="stack-card"><div class="lbl">Frontend</div><div class="val">Next.js (React)</div><p>App Router, SSR/SSG dla SEO. Prototyp jest już w React — komponenty przenosimy 1:1. Stylowanie: CSS Modules / Tailwind z tokenami z prototypu.</p></div>
+      <div class="stack-card"><div class="lbl">Backend / API</div><div class="val">Next.js API Routes lub Node (NestJS)</div><p>REST lub tRPC. Logika koszyka, zamówień, webhooki płatności i wysyłki.</p></div>
+      <div class="stack-card"><div class="lbl">Baza danych</div><div class="val">PostgreSQL + Prisma</div><p>Relacyjna, idealna dla zamówień. Prisma jako ORM (migracje, typowanie). Hosting: Supabase / Neon / Railway.</p></div>
+      <div class="stack-card"><div class="lbl">Płatności</div><div class="val">Stripe lub Przelewy24</div><p>Stripe = najlepszy DX i obsługa kart + BLIK. Przelewy24 = lepsza lokalna obsługa BLIK/przelewów PL.</p></div>
+      <div class="stack-card"><div class="lbl">Hosting</div><div class="val">Vercel</div><p>Natywny dla Next.js, automatyczny CI/CD z Git, certyfikat SSL, CDN. Alternatywa: własny VPS.</p></div>
+      <div class="stack-card"><div class="lbl">Media / zdjęcia</div><div class="val">Cloudinary / Vercel Blob</div><p>Optymalizacja i serwowanie zdjęć słoików i pasieki. Prototyp używa placeholderów do podmiany.</p></div>
+      <div class="stack-card"><div class="lbl">CMS treści</div><div class="val">Sanity / Payload</div><p>Dla bloga „Dziennik" i sekcji edytowalnych — właściciel dodaje wpisy bez kodu.</p></div>
+      <div class="stack-card"><div class="lbl">E-mail transakcyjny</div><div class="val">Resend / Postmark</div><p>Potwierdzenia zamówień, statusy wysyłki. Newsletter: MailerLite / Brevo.</p></div>
+    </div>
+    <div class="note"><span class="hex"></span><div><strong>Rekomendacja:</strong> Ścieżka B (Next.js + PostgreSQL + Stripe/Przelewy24 + Vercel). Daje 100% zgodności z prototypem, dobre SEO i niskie koszty hostingu przy obecnej skali, a jednocześnie skaluje się wraz z rozwojem pasieki.</div></div>
+  </section>
+
+  <!-- 03 ARCH -->
+  <section id="arch">
+    <div class="sec-num">03</div>
+    <h2>Architektura systemu</h2>
+    <p class="sec-intro">Przepływ danych między przeglądarką klienta, serwerem aplikacji, bazą oraz usługami zewnętrznymi (płatności, wysyłka, e-mail).</p>
+    <pre><span class="c"># Przepływ wysokopoziomowy</span>
+
+  Przeglądarka (Next.js, React)
+        │  REST / tRPC
+        ▼
+  Serwer aplikacji (API)  ──────►  PostgreSQL  (produkty, zamówienia, treści)
+        │
+        ├──►  <span class="k">Stripe / Przelewy24</span>   (sesja płatności + webhook potwierdzenia)
+        ├──►  <span class="k">InPost / Furgonetka API</span> (utworzenie przesyłki, etykieta, tracking)
+        ├──►  <span class="k">Resend / Postmark</span>      (e-mail potwierdzający + status)
+        └──►  <span class="k">Sanity / Payload CMS</span>    (wpisy bloga, edytowalne treści)
+
+  Panel admina (chroniony) ──►  ten sam serwer API + baza</pre>
+    <h4>Kluczowe zasady</h4>
+    <ul>
+      <li><strong>Cena liczona po stronie serwera.</strong> Nigdy nie ufamy cenie z przeglądarki — przy tworzeniu zamówienia backend przelicza sumę na podstawie wariantów z bazy.</li>
+      <li><strong>Płatność potwierdzana webhookiem.</strong> Zamówienie zmienia status na „opłacone" dopiero po asynchronicznym webhooku od operatora płatności, nie po powrocie użytkownika na stronę.</li>
+      <li><strong>Rezerwacja stanu magazynowego</strong> przy składaniu zamówienia, zwolnienie przy nieudanej/porzuconej płatności.</li>
+    </ul>
+  </section>
+
+  <!-- 04 DANE -->
+  <section id="dane">
+    <div class="sec-num">04</div>
+    <h2>Model danych</h2>
+    <p class="sec-intro">Główne encje i relacje. Produkt (odmiana miodu) ma wiele wariantów (wielkości słoika). Zamówienie zawiera pozycje, każda wskazująca konkretny wariant z ceną zamrożoną w chwili zakupu.</p>
+
+    <table>
+      <thead><tr><th>Encja</th><th>Najważniejsze pola</th><th>Relacje</th></tr></thead>
+      <tbody>
+        <tr><td>Product</td><td><code>id</code>, <code>slug</code>, <code>name</code>, <code>tagline</code>, <code>description</code>, <code>season</code>, <code>color</code>, <code>notes[]</code>, <code>pairing</code>, <code>isBestseller</code>, <code>isActive</code></td><td>ma wiele <code>Variant</code>, <code>ProductImage</code></td></tr>
+        <tr><td>Variant</td><td><code>id</code>, <code>productId</code>, <code>size</code> (s/m/l), <code>label</code>, <code>weightGrams</code>, <code>priceGrosze</code>, <code>stock</code>, <code>sku</code></td><td>należy do <code>Product</code></td></tr>
+        <tr><td>ProductImage</td><td><code>id</code>, <code>productId</code>, <code>url</code>, <code>alt</code>, <code>position</code></td><td>należy do <code>Product</code></td></tr>
+        <tr><td>Order</td><td><code>id</code>, <code>number</code> (MEL-XXXX), <code>status</code>, <code>email</code>, <code>phone</code>, <code>subtotalGrosze</code>, <code>shippingGrosze</code>, <code>totalGrosze</code>, <code>deliveryMethod</code>, <code>paymentProvider</code>, <code>paymentStatus</code>, <code>createdAt</code></td><td>ma wiele <code>OrderItem</code>, ma jeden <code>ShippingAddress</code></td></tr>
+        <tr><td>OrderItem</td><td><code>id</code>, <code>orderId</code>, <code>variantId</code>, <code>productName</code>, <code>variantLabel</code>, <code>unitPriceGrosze</code>, <code>quantity</code></td><td>należy do <code>Order</code></td></tr>
+        <tr><td>ShippingAddress</td><td><code>id</code>, <code>orderId</code>, <code>fullName</code>, <code>street</code>, <code>city</code>, <code>zip</code>, <code>parcelLockerCode</code></td><td>należy do <code>Order</code></td></tr>
+        <tr><td>BlogPost</td><td><code>id</code>, <code>slug</code>, <code>title</code>, <code>category</code>, <code>excerpt</code>, <code>body</code>, <code>coverUrl</code>, <code>readMinutes</code>, <code>publishedAt</code></td><td>—</td></tr>
+        <tr><td>Review</td><td><code>id</code>, <code>productId?</code>, <code>authorName</code>, <code>city</code>, <code>rating</code>, <code>text</code>, <code>isApproved</code></td><td>opcjonalnie do <code>Product</code></td></tr>
+        <tr><td>NewsletterSubscriber</td><td><code>id</code>, <code>email</code>, <code>confirmedAt</code>, <code>createdAt</code></td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note"><span class="hex"></span><div><strong>Kwoty w groszach (integer).</strong> Wszystkie ceny przechowujemy jako liczby całkowite w groszach (np. 60 zł = <code>6000</code>), aby uniknąć błędów zaokrągleń liczb zmiennoprzecinkowych. Ceny startowe: mały 250 g = <code>3000</code>, średni 500 g = <code>4500</code>, duży 900 g = <code>6000</code>.</div></div>
+
+    <h3>Szkic schematu (Prisma)</h3>
+    <pre><span class="k">model</span> Product {
+  id          String    <span class="c">@id @default(cuid())</span>
+  slug        String    <span class="c">@unique</span>
+  name        String
+  tagline     String
+  description String
+  season      String
+  color       String    <span class="c">// hex motywu słoika</span>
+  notes       String[]
+  pairing     String
+  isBestseller Boolean  <span class="c">@default(false)</span>
+  isActive    Boolean   <span class="c">@default(true)</span>
+  variants    Variant[]
+  images      ProductImage[]
+}
+
+<span class="k">model</span> Variant {
+  id          String   <span class="c">@id @default(cuid())</span>
+  product     Product  <span class="c">@relation(fields: [productId], references: [id])</span>
+  productId   String
+  size        String   <span class="c">// "s" | "m" | "l"</span>
+  label       String   <span class="c">// "Mały" | "Średni" | "Duży"</span>
+  weightGrams Int
+  priceGrosze Int
+  stock       Int      <span class="c">@default(0)</span>
+  sku         String   <span class="c">@unique</span>
+}
+
+<span class="k">model</span> Order {
+  id            String   <span class="c">@id @default(cuid())</span>
+  number        String   <span class="c">@unique</span>
+  status        String   <span class="c">// new | paid | packed | shipped | done | cancelled</span>
+  email         String
+  phone         String
+  items         OrderItem[]
+  address       ShippingAddress?
+  subtotalGrosze Int
+  shippingGrosze Int
+  totalGrosze    Int
+  deliveryMethod String  <span class="c">// paczkomat | kurier | odbior</span>
+  paymentProvider String <span class="c">// stripe | przelewy24</span>
+  paymentStatus String   <span class="c">// pending | paid | failed</span>
+  paymentRef    String?  <span class="c">// id sesji u operatora</span>
+  createdAt     DateTime <span class="c">@default(now())</span>
+}</pre>
+  </section>
+
+  <!-- 05 API -->
+  <section id="api">
+    <div class="sec-num">05</div>
+    <h2>API — punkty końcowe</h2>
+    <p class="sec-intro">Minimalny zestaw REST dla MVP. Endpointy publiczne (sklep) oraz chronione (panel admina, autoryzacja sesją/tokenem).</p>
+
+    <h4>Publiczne — katalog i treści</h4>
+    <table>
+      <tbody>
+        <tr><td><span class="m get">GET</span></td><td class="ep">/api/products</td><td>Lista aktywnych produktów z wariantami i ceną „od".</td></tr>
+        <tr><td><span class="m get">GET</span></td><td class="ep">/api/products/:slug</td><td>Szczegóły odmiany miodu + warianty + zdjęcia.</td></tr>
+        <tr><td><span class="m get">GET</span></td><td class="ep">/api/posts</td><td>Wpisy bloga „Dziennik".</td></tr>
+        <tr><td><span class="m get">GET</span></td><td class="ep">/api/reviews</td><td>Zatwierdzone opinie klientów.</td></tr>
+        <tr><td><span class="m post">POST</span></td><td class="ep">/api/newsletter</td><td>Zapis e-maila do newslettera (double opt-in).</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Publiczne — zamówienie i płatność</h4>
+    <table>
+      <tbody>
+        <tr><td><span class="m post">POST</span></td><td class="ep">/api/checkout/quote</td><td>Przyjmuje koszyk + metodę dostawy, zwraca przeliczoną sumę (subtotal, dostawa, total, próg darmowej wysyłki).</td></tr>
+        <tr><td><span class="m post">POST</span></td><td class="ep">/api/orders</td><td>Tworzy zamówienie (status <code>new</code>), rezerwuje stan, zwraca <code>orderId</code> + URL/sekret sesji płatności.</td></tr>
+        <tr><td><span class="m get">GET</span></td><td class="ep">/api/orders/:number</td><td>Status zamówienia (strona potwierdzenia / śledzenie).</td></tr>
+        <tr><td><span class="m post">POST</span></td><td class="ep">/api/webhooks/payment</td><td>Webhook od Stripe/Przelewy24 — ustawia <code>paymentStatus=paid</code>, wysyła e-mail, inicjuje przesyłkę.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Chronione — panel administracyjny</h4>
+    <table>
+      <tbody>
+        <tr><td><span class="m post">POST</span> <span class="m patch">PATCH</span> <span class="m del">DEL</span></td><td class="ep">/api/admin/products…</td><td>CRUD produktów i wariantów, ustawianie stanów i cen.</td></tr>
+        <tr><td><span class="m get">GET</span> <span class="m patch">PATCH</span></td><td class="ep">/api/admin/orders…</td><td>Lista zamówień, zmiana statusu, generowanie etykiety wysyłki.</td></tr>
+        <tr><td><span class="m post">POST</span> <span class="m patch">PATCH</span></td><td class="ep">/api/admin/posts…</td><td>Zarządzanie wpisami bloga (jeśli bez zewnętrznego CMS).</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><span class="hex"></span><div><strong>Walidacja po stronie serwera obowiązkowa.</strong> <code>/api/orders</code> ignoruje ceny z żądania — pobiera aktualne <code>priceGrosze</code> wariantów z bazy i sam liczy sumę. Chroni przed manipulacją ceną w przeglądarce.</div></div>
+  </section>
+
+  <!-- 06 PLATNOSCI -->
+  <section id="platnosci">
+    <div class="sec-num">06</div>
+    <h2>Płatności — Stripe / Przelewy24</h2>
+    <p class="sec-intro">Architektura jest niezależna od operatora — wystarczy implementacja jednego interfejsu <code>PaymentProvider</code>. Poniżej przepływ na przykładzie Stripe Checkout; dla Przelewy24 logika jest analogiczna.</p>
+
+    <h4>Przepływ płatności</h4>
+    <ol class="steps">
+      <li>Klient klika <strong>„Zapłać"</strong> → frontend wysyła koszyk do <code>POST /api/orders</code>.</li>
+      <li>Backend tworzy zamówienie (<code>new</code>), przelicza kwotę, rezerwuje stany i tworzy <strong>sesję płatności</strong> u operatora.</li>
+      <li>Backend zwraca URL przekierowania (Stripe Checkout) lub sekret do widgetu (BLIK/Przelewy24).</li>
+      <li>Klient finalizuje płatność u operatora (karta / BLIK / przelew).</li>
+      <li>Operator wywołuje <strong>webhook</strong> <code>POST /api/webhooks/payment</code> (zweryfikowany podpisem) → status <code>paid</code>.</li>
+      <li>Backend wysyła e-mail potwierdzający i (dla kuriera/paczkomatu) tworzy przesyłkę.</li>
+      <li>Klient wraca na <strong>stronę potwierdzenia</strong> (ekran „Dziękujemy za zamówienie" z prototypu).</li>
+    </ol>
+
+    <h4>Szkic — utworzenie sesji Stripe</h4>
+    <pre><span class="c">// POST /api/orders — fragment</span>
+<span class="k">const</span> order = <span class="k">await</span> db.order.create({ <span class="c">/* status: "new", pozycje, kwoty */</span> });
+
+<span class="k">const</span> session = <span class="k">await</span> stripe.checkout.sessions.create({
+  mode: <span class="s">"payment"</span>,
+  currency: <span class="s">"pln"</span>,
+  payment_method_types: [<span class="s">"card"</span>, <span class="s">"blik"</span>, <span class="s">"p24"</span>],
+  line_items: order.items.map(toStripeLineItem),
+  success_url: <span class="s">`https://mellis.pl/zamowienie/${order.number}`</span>,
+  cancel_url:  <span class="s">`https://mellis.pl/koszyk`</span>,
+  metadata: { orderId: order.id },
+});
+<span class="k">return</span> { orderId: order.id, checkoutUrl: session.url };</pre>
+
+    <div class="note"><span class="hex"></span><div><strong>BLIK i Przelewy24 dla rynku PL.</strong> Stripe obsługuje BLIK i P24 natywnie w PLN — w wielu przypadkach wystarczy jeden operator. Jeśli priorytetem są niższe prowizje i lokalne wsparcie, rozważ Przelewy24/Autopay jako głównego operatora. Interfejs <code>PaymentProvider</code> pozwala podmienić go bez zmian w UI.</div></div>
+    <h4>Dane potrzebne do uruchomienia (od właściciela)</h4>
+    <ul>
+      <li>Działalność gospodarcza / firma + konto u operatora płatności (weryfikacja KYC).</li>
+      <li>Numer konta firmowego do wypłat.</li>
+      <li>Klucze API operatora (test + produkcja) i sekret webhooka.</li>
+    </ul>
+  </section>
+
+  <!-- 07 DOSTAWA -->
+  <section id="dostawa">
+    <div class="sec-num">07</div>
+    <h2>Dostawa — InPost, kurier, odbiór</h2>
+    <p class="sec-intro">Trzy metody zgodnie z prototypem. Koszty i progi konfigurowalne w panelu.</p>
+    <table>
+      <thead><tr><th>Metoda</th><th>Czas</th><th>Koszt (przykład)</th><th>Integracja</th></tr></thead>
+      <tbody>
+        <tr><td>Paczkomat InPost</td><td>1–2 dni robocze</td><td>12 zł</td><td>InPost ShipX API — widget wyboru paczkomatu (Geowidget), automatyczna etykieta.</td></tr>
+        <tr><td>Kurier (DPD / InPost)</td><td>1–2 dni robocze</td><td>16 zł</td><td>InPost / DPD API lub agregator <code>Furgonetka</code> / <code>BaseLinker</code>.</td></tr>
+        <tr><td>Odbiór osobisty</td><td>po umówieniu</td><td>0 zł</td><td>Brak integracji — kontakt telefoniczny/mailowy, status ręczny w panelu.</td></tr>
+      </tbody>
+    </table>
+    <h4>Uwagi wdrożeniowe</h4>
+    <ul>
+      <li><strong>Darmowa dostawa od progu</strong> (w prototypie: 150 zł) — logika po stronie <code>/api/checkout/quote</code>.</li>
+      <li><strong>Geowidget InPost</strong> do wyboru paczkomatu — zwraca kod punktu zapisywany w <code>ShippingAddress.parcelLockerCode</code>.</li>
+      <li><strong>Pakowanie produktu szklanego</strong> — uwzględnić w opisie zamówienia (ostrożnie, miód = szkło). Nie wpływa na kod, ale na proces.</li>
+      <li>Numer śledzenia z API zapisujemy w zamówieniu i wysyłamy klientowi e-mailem.</li>
+    </ul>
+  </section>
+
+  <!-- 08 ADMIN -->
+  <section id="admin">
+    <div class="sec-num">08</div>
+    <h2>Panel administracyjny i CMS</h2>
+    <p class="sec-intro">Właściciel pasieki musi obsłużyć sklep samodzielnie, bez programisty. Prosty, czytelny panel.</p>
+    <h4>Funkcje panelu</h4>
+    <ul>
+      <li><strong>Zamówienia</strong> — lista, szczegóły, zmiana statusu (nowe → opłacone → spakowane → wysłane → zrealizowane), wydruk etykiety, numer śledzenia.</li>
+      <li><strong>Produkty i magazyn</strong> — edycja odmian, wariantów, cen, opisów; <strong>stany magazynowe</strong> z ostrzeżeniem o niskim stanie; włączanie/wyłączanie produktu (np. sezonowy miód wrzosowy).</li>
+      <li><strong>Treści</strong> — wpisy bloga „Dziennik", zdjęcia galerii, sekcja „O nas".</li>
+      <li><strong>Opinie</strong> — moderacja i zatwierdzanie recenzji.</li>
+      <li><strong>Newsletter</strong> — eksport adresów lub integracja z MailerLite/Brevo.</li>
+    </ul>
+    <div class="note"><span class="hex"></span><div><strong>CMS bez kodu:</strong> dla bloga i edytowalnych treści warto użyć gotowego CMS (Sanity / Payload) — właściciel dodaje wpisy i zdjęcia przez przyjazny interfejs, a programista nie jest potrzebny do codziennej obsługi.</div></div>
+  </section>
+
+  <!-- 09 PRAWO -->
+  <section id="prawo">
+    <div class="sec-num">09</div>
+    <h2>Wymogi prawne (RODO, sprzedaż żywności)</h2>
+    <p class="sec-intro">Sklep sprzedaje żywność konsumentom w Polsce — obowiązują przepisy e-commerce, RODO oraz wymogi dla produktów spożywczych. Poniżej lista do wdrożenia (skonsultować z prawnikiem/księgowym).</p>
+    <ul>
+      <li><strong>Regulamin sklepu</strong> i <strong>Polityka prywatności</strong> — wymagane, dostępne ze stopki (linki już w prototypie).</li>
+      <li><strong>Zgody i RODO</strong> — checkboxy zgód (regulamin, przetwarzanie danych, newsletter), informacja o administratorze danych, prawo do usunięcia.</li>
+      <li><strong>Prawo odstąpienia</strong> — uwaga: żywność łatwo psująca się / o krótkim terminie może być wyłączona z prawa zwrotu; jednoznacznie określić w regulaminie.</li>
+      <li><strong>Etykieta produktu spożywczego</strong> — skład, masa netto, dane producenta, warunki przechowywania, kraj pochodzenia, numer partii. Dane wyświetlane na stronie produktu i na słoiku.</li>
+      <li><strong>Cookies</strong> — baner zgody na pliki cookie / analitykę.</li>
+      <li><strong>Faktury / paragony</strong> — integracja z systemem fakturowym lub kasą online (zależnie od formy działalności).</li>
+    </ul>
+    <div class="note"><span class="hex"></span><div><strong>Zastrzeżenie:</strong> powyższe to lista techniczna do uwzględnienia w implementacji, nie porada prawna. Treść regulaminu i zakres obowiązków podatkowych należy potwierdzić z prawnikiem i księgowym.</div></div>
+  </section>
+
+  <!-- 10 SEO -->
+  <section id="seo">
+    <div class="sec-num">10</div>
+    <h2>SEO, wydajność, analityka</h2>
+    <ul>
+      <li><strong>SSR/SSG</strong> stron produktowych i bloga (Next.js) — szybkie ładowanie i indeksacja.</li>
+      <li><strong>Dane strukturalne</strong> <code>Product</code>, <code>Offer</code>, <code>AggregateRating</code>, <code>Article</code> (Schema.org / JSON-LD).</li>
+      <li><strong>Meta i Open Graph</strong> dla każdego produktu i wpisu; <code>sitemap.xml</code> i <code>robots.txt</code>.</li>
+      <li><strong>Optymalizacja zdjęć</strong> (WebP/AVIF, lazy-loading) — kluczowe dla marki opartej na zdjęciach.</li>
+      <li><strong>Analityka</strong> — Google Analytics 4 lub Plausible (prywatność); zdarzenia e-commerce (dodanie do koszyka, zakup).</li>
+      <li><strong>Wydajność</strong> — cel Lighthouse ≥ 90; Core Web Vitals w zielonych zakresach.</li>
+    </ul>
+  </section>
+
+  <!-- 11 EKRANY -->
+  <section id="ekrany">
+    <div class="sec-num">11</div>
+    <h2>Mapa ekranów prototypu</h2>
+    <p class="sec-intro">Ekrany z pliku <code>MELLIS.html</code> i odpowiadające im trasy docelowej aplikacji.</p>
+    <table>
+      <thead><tr><th>Ekran w prototypie</th><th>Trasa (URL)</th><th>Uwagi</th></tr></thead>
+      <tbody>
+        <tr><td>Strona główna (3 warianty hero)</td><td><code>/</code></td><td>Wybrać 1 z 3 wariantów w panelu Tweaks jako kierunek finalny.</td></tr>
+        <tr><td>Sklep / lista miodów</td><td><code>/sklep</code></td><td>Filtry: wszystkie / bestsellery / łagodne / wyraziste.</td></tr>
+        <tr><td>Szczegóły produktu</td><td><code>/sklep/[slug]</code></td><td>Wybór wielkości słoika, ilość, dodanie do koszyka.</td></tr>
+        <tr><td>Koszyk (panel boczny)</td><td>komponent globalny</td><td>Wysuwany z każdej strony.</td></tr>
+        <tr><td>Zamówienie / checkout</td><td><code>/zamowienie</code></td><td>3 kroki: dostawa → dane → płatność → potwierdzenie.</td></tr>
+        <tr><td>O nas</td><td><code>/o-nas</code></td><td>Historia, proces, FAQ, kontakt, odbiór osobisty.</td></tr>
+        <tr><td>Galeria</td><td><code>/galeria</code></td><td>Siatka zdjęć (placeholdery do podmiany).</td></tr>
+        <tr><td>Dziennik / blog</td><td><code>/dziennik</code>, <code>/dziennik/[slug]</code></td><td>Wpisy z CMS.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 12 ETAPY -->
+  <section id="etapy">
+    <div class="sec-num">12</div>
+    <h2>Etapy wdrożenia</h2>
+    <p class="sec-intro">Proponowana kolejność prac. Pozwala uruchomić sprzedaż możliwie wcześnie, a funkcje treściowe dodawać iteracyjnie.</p>
+    <div class="phases">
+      <div class="phase"><span class="ph-n">1</span><div><h4>Fundament i katalog</h4><p>Setup repo, baza + schemat, import 6 produktów × 3 warianty, strony główna / sklep / produkt na bazie prototypu, podmiana zdjęć.</p></div><span class="ph-t">~ etap 1</span></div>
+      <div class="phase"><span class="ph-n">2</span><div><h4>Koszyk i zamówienia</h4><p>Koszyk, <code>/checkout/quote</code>, tworzenie zamówienia, walidacja po stronie serwera, e-mail potwierdzający.</p></div><span class="ph-t">~ etap 2</span></div>
+      <div class="phase"><span class="ph-n">3</span><div><h4>Płatności i dostawa</h4><p>Integracja Stripe/Przelewy24 + webhook, InPost Geowidget i etykiety, progi darmowej dostawy. <strong>Sprzedaż rusza.</strong></p></div><span class="ph-t">~ etap 3</span></div>
+      <div class="phase"><span class="ph-n">4</span><div><h4>Panel admina</h4><p>Zarządzanie zamówieniami, magazynem i cenami, moderacja opinii.</p></div><span class="ph-t">~ etap 4</span></div>
+      <div class="phase"><span class="ph-n">5</span><div><h4>Treści i SEO</h4><p>O nas, galeria, dziennik/blog (CMS), newsletter, dane strukturalne, analityka, optymalizacja.</p></div><span class="ph-t">~ etap 5</span></div>
+      <div class="phase"><span class="ph-n">6</span><div><h4>Prawo i wdrożenie produkcyjne</h4><p>Regulamin, polityka prywatności, zgody RODO, cookies, faktury, testy, uruchomienie domeny mellis.pl.</p></div><span class="ph-t">~ etap 6</span></div>
+    </div>
+    <div class="note"><span class="hex"></span><div><strong>Najkrótsza droga do sprzedaży:</strong> etapy 1–3 dają działający sklep, który przyjmuje płatności i wysyła miód. Etapy 4–6 podnoszą komfort obsługi, widoczność w Google i zgodność prawną.</div></div>
+  </section>
+
+  <footer>
+    MELLIS · Specyfikacja techniczna v1.0 · Czerwiec 2026 · Dokument towarzyszący prototypowi <code style="font-family:var(--mono);font-size:12px;">MELLIS.html</code>
+  </footer>
+</div>
+</body>
+</html>

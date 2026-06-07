@@ -1,0 +1,167 @@
+/* ============================================================
+   MELLIS — Pasieka rodzinna
+   Design tokens + base styles (boutique premium)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap');
+
+:root {
+  /* — Color: warm honey palette — */
+  --cream:        #FAF5EA;   /* page background */
+  --cream-deep:   #F2E9D6;   /* alt sections */
+  --paper:        #FFFDF8;   /* cards */
+  --ink:          #2A2014;   /* primary text (espresso) */
+  --ink-soft:     #5B4A33;   /* secondary text */
+  --ink-faint:    #8A7656;   /* muted / captions */
+  --line:         #E4D8BF;   /* hairlines */
+  --line-soft:    #EFE7D4;
+
+  --honey:        #C8881E;   /* primary amber accent */
+  --honey-deep:   #A8631A;   /* darker amber */
+  --honey-glow:   #E6B23C;   /* highlight gold */
+  --amber-wash:   #F6E8C8;   /* soft amber fill */
+  --sage:         #6E7355;   /* muted olive (nature nod) */
+
+  /* — Type — */
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Jost', system-ui, sans-serif;
+
+  /* — Tokens controlled by Tweaks — */
+  --c-accent: var(--honey);
+  --c-bg: var(--cream);
+  --c-ink: var(--ink);
+
+  /* — Spacing / shape — */
+  --radius: 4px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px rgba(42,32,20,.05), 0 4px 14px rgba(42,32,20,.05);
+  --shadow-md: 0 8px 30px rgba(42,32,20,.10);
+  --shadow-lg: 0 24px 60px rgba(42,32,20,.16);
+  --maxw: 1240px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  color: var(--c-ink);
+  background: var(--c-bg);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+#root { min-height: 100vh; }
+
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 500; line-height: 1.08; letter-spacing: -.01em; color: var(--ink); }
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* — Reusable utility classes — */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; width: 100%; }
+.wrap-narrow { max-width: 880px; margin: 0 auto; padding: 0 32px; width: 100%; }
+
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--honey-deep);
+}
+.eyebrow.muted { color: var(--ink-faint); }
+
+.serif-xl { font-family: var(--serif); font-size: clamp(48px, 7vw, 104px); font-weight: 500; line-height: .98; letter-spacing: -.02em; }
+.serif-lg { font-family: var(--serif); font-size: clamp(34px, 4.6vw, 60px); font-weight: 500; line-height: 1.04; }
+.serif-md { font-family: var(--serif); font-size: clamp(26px, 3vw, 38px); font-weight: 500; }
+
+.price-tag { font-family: var(--sans); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: .01em; white-space: nowrap; }
+
+/* — Buttons — */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--sans); font-weight: 500; font-size: 14px;
+  letter-spacing: .04em; text-transform: uppercase;
+  padding: 15px 30px; border-radius: var(--radius);
+  transition: all .22s cubic-bezier(.2,.7,.3,1);
+  white-space: nowrap; line-height: 1;
+}
+.btn-primary { background: var(--c-accent); color: #fff; }
+.btn-primary:hover { background: var(--honey-deep); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(168,99,26,.28); }
+.btn-dark { background: var(--ink); color: var(--cream); }
+.btn-dark:hover { background: #3a2c1a; transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { border-color: var(--honey); color: var(--honey-deep); background: var(--paper); }
+.btn-sm { padding: 11px 20px; font-size: 12.5px; }
+.btn-block { width: 100%; }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+/* — Form fields — */
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.field input, .field textarea, .field select {
+  font-family: var(--sans); font-size: 15px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px; width: 100%;
+  transition: border-color .18s, box-shadow .18s;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none; border-color: var(--honey);
+  box-shadow: 0 0 0 3px rgba(200,136,30,.12);
+}
+.field input::placeholder { color: #b6a684; }
+
+/* — Hairline divider — */
+.rule { height: 1px; background: var(--line); border: none; }
+
+/* — Placeholder imagery (striped, monospace labels) — */
+.ph {
+  position: relative; overflow: hidden; background: var(--amber-wash);
+  background-image: repeating-linear-gradient(135deg, rgba(168,99,26,.07) 0 2px, transparent 2px 11px);
+  display: flex; align-items: flex-end; justify-content: flex-start;
+}
+.ph .ph-label {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 10.5px; letter-spacing: .04em; color: var(--honey-deep);
+  background: rgba(255,253,248,.82); border: 1px solid rgba(168,99,26,.18);
+  padding: 4px 9px; margin: 12px; border-radius: 3px; backdrop-filter: blur(2px);
+}
+.ph-dark { background: #251c11; background-image: repeating-linear-gradient(135deg, rgba(230,178,60,.10) 0 2px, transparent 2px 11px); }
+.ph-dark .ph-label { color: var(--honey-glow); background: rgba(20,15,8,.6); border-color: rgba(230,178,60,.25); }
+
+/* — Honeycomb hex accent (pure CSS, simple) — */
+.hex {
+  width: 13px; height: 14px; background: var(--c-accent);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  display: inline-block;
+}
+
+/* — Badge / chip — */
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--honey-deep); background: var(--amber-wash);
+  padding: 6px 12px; border-radius: 100px; white-space: nowrap;
+}
+
+/* — Section vertical rhythm — */
+.section { padding: clamp(64px, 9vw, 130px) 0; }
+.section-sm { padding: clamp(48px, 6vw, 84px) 0; }
+
+/* — Scrollbar — */
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-thumb { background: #d9c79f; border-radius: 10px; border: 3px solid var(--cream); }
+::-webkit-scrollbar-track { background: var(--cream); }
+
+/* — Reveal on scroll — */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.3,1); }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 760px) {
+  .wrap, .wrap-narrow { padding: 0 20px; }
+}
