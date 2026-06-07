@@ -1,0 +1,6 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /zamowienie
+
+Sitemap: https://wo1techu.github.io/moja-pasieka/sitemap.xml
