@@ -1,8 +1,8 @@
 "use client";
 
 /* Wielokrokowy proces zamówienia. Port z prototypu (pages-checkout.jsx).
-   Finalizacja woła POST /api/checkout, który przelicza kwoty po stronie
-   serwera i (docelowo) tworzy sesję płatności u operatora. */
+   Finalizacja liczy kwoty przez czyste funkcje z lib/ (buildOrderDraft) i
+   dostawcę płatności (lib/payments) — szew pod Stripe/Przelewy24. */
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,8 @@ import { Jar } from "@/components/Jar";
 import { useCart } from "@/lib/cart";
 import { formatPLN } from "@/lib/money";
 import { DELIVERY, FREE_SHIPPING_THRESHOLD_GROSZE } from "@/lib/data";
+import { buildOrderDraft } from "@/lib/orders";
+import { getPaymentProvider } from "@/lib/payments";
 import type { DeliveryMethod } from "@/lib/types";
 
 type PayId = "blik" | "card" | "transfer";
@@ -77,30 +79,34 @@ export function Checkout() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: lines.map((l) => ({ productId: l.productId, sizeId: l.sizeId, qty: l.qty })),
-          deliveryMethodId: deliv.id,
-          email: form.email,
-        }),
+      // Wersja statyczna (GitHub Pages): brak serwera, więc kwoty liczymy
+      // bezpośrednio przez czyste funkcje z lib/ (te same, których używałby
+      // endpoint /api/checkout). Szew pod Stripe pozostaje: getPaymentProvider()
+      // można podmienić na wariant „redirect" po wdrożeniu na serwer.
+      const built = buildOrderDraft({
+        items: lines.map((l) => ({ productId: l.productId, sizeId: l.sizeId, qty: l.qty })),
+        deliveryMethodId: deliv.id,
+        email: form.email,
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        setError(data.error ?? "Nie udało się złożyć zamówienia. Spróbuj ponownie.");
+      if (!built.ok) {
+        setError(built.error ?? "Nie udało się złożyć zamówienia. Spróbuj ponownie.");
         return;
       }
-      // Tryb redirect (przyszła integracja Stripe) — przekieruj do operatora
-      if (data.mode === "redirect" && data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+
+      const provider = getPaymentProvider();
+      const checkout = await provider.createCheckout(built.order);
+
+      // Tryb redirect (przyszła integracja Stripe na serwerze) — przekieruj.
+      if (checkout.mode === "redirect" && checkout.redirectUrl) {
+        window.location.href = checkout.redirectUrl;
         return;
       }
-      // Tryb demo — potwierdzenie od razu
+
+      // Tryb demo — potwierdzenie od razu.
       setResult({
-        orderNumber: data.orderNumber,
-        totalGrosze: data.totalGrosze,
-        deliveryMethod: data.deliveryMethod,
+        orderNumber: checkout.orderNumber,
+        totalGrosze: built.order.totalGrosze,
+        deliveryMethod: built.order.deliveryMethod,
         pay,
         email: form.email,
       });
@@ -108,7 +114,7 @@ export function Checkout() {
       setStep(4);
       window.scrollTo(0, 0);
     } catch {
-      setError("Błąd połączenia. Sprawdź sieć i spróbuj ponownie.");
+      setError("Nie udało się złożyć zamówienia. Spróbuj ponownie.");
     } finally {
       setSubmitting(false);
     }

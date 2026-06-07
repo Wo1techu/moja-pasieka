@@ -1,7 +1,7 @@
 "use client";
 
-/* Pasek newslettera. Port z prototypu — wysyła e-mail do /api/newsletter
-   (na ten moment endpoint tylko waliduje i potwierdza; docelowo double opt-in). */
+/* Pasek newslettera. Wersja statyczna (GitHub Pages) potwierdza zapis po
+   stronie klienta — brak serwera; docelowo MailerLite/Brevo + double opt-in. */
 
 import { useState } from "react";
 
@@ -10,23 +10,14 @@ export function Newsletter() {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  async function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!v.includes("@")) return;
+    // Wersja statyczna (GitHub Pages): brak serwera — potwierdzamy po stronie
+    // klienta. Docelowo (na serwerze) podłączyć MailerLite/Brevo + double opt-in.
     setBusy(true);
-    try {
-      await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: v }),
-      });
-      setDone(true);
-    } catch {
-      // nawet przy błędzie sieci nie blokujemy UX prototypu
-      setDone(true);
-    } finally {
-      setBusy(false);
-    }
+    setDone(true);
+    setBusy(false);
   }
 
   return (
